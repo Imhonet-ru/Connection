@@ -2,7 +2,6 @@
 
 namespace Imhonet\Connection\Query\PDO;
 
-
 use Imhonet\Connection\Query\Query;
 
 abstract class PDO extends Query
@@ -10,6 +9,8 @@ abstract class PDO extends Query
     private $statements = array();
     private $params = array();
     private $placeholders = array();
+    private $count_total = 0;
+    private $need_count_total = false;
 
     /**
      * @var \PDOStatement|null
@@ -49,7 +50,7 @@ abstract class PDO extends Query
             }
         }
 
-        $this->params[ $this->getStatementId() ] = $params;
+        $this->params[$this->getStatementId()] = $params;
 
         return $this;
     }
@@ -60,7 +61,7 @@ abstract class PDO extends Query
      */
     private function addPlaceholder($count)
     {
-        $placeholders = & $this->placeholders[ $this->getStatementId() ];
+        $placeholders = & $this->placeholders[$this->getStatementId()];
         $placeholders[] = $count > 0 ? str_repeat('?,', $count - 1) . '?' : null;
 
         return $this;
@@ -92,6 +93,14 @@ abstract class PDO extends Query
             if (isset($stmt)) {
                 $this->success = $stmt->execute();
                 $this->response = $stmt;
+
+                if ($this->need_count_total) {
+                    $countStmt = $this->getResource()->prepare("SELECT FOUND_ROWS() as cnt;");
+                    $countStmt->execute();
+                    $found_data = $countStmt->fetch();
+                    $this->count_total = $found_data['cnt'];
+                }
+
             }
         }
 
@@ -117,14 +126,27 @@ abstract class PDO extends Query
     {
         $statement_id = key($this->statements);
 
-        return vsprintf($this->statements[$statement_id], $this->placeholders[$statement_id]);
+        $statement = $this->prepareStatement($this->statements[$statement_id]);
+
+        return vsprintf($statement, $this->placeholders[$statement_id]);
+    }
+
+    private function prepareStatement($statement)
+    {
+        if (strpos($statement, 'SQL_CALC_FOUND_ROWS') !== false) {
+            $this->need_count_total = true;
+        } elseif ($this->need_count_total) {
+            $statement = str_ireplace('SELECT', 'SELECT SQL_CALC_FOUND_ROWS ', $statement);
+        }
+
+        return $statement;
     }
 
     private function getParams()
     {
         $statement_id = key($this->statements);
 
-        return $this->params[$statement_id];
+        return $this->params[$statement_id] ? : array();
     }
 
     private function hasResponse()
@@ -154,10 +176,25 @@ abstract class PDO extends Query
         return (int) $this->isError();
     }
 
-    public function __destruct()
+    public function getCountTotal()
     {
-        if ($this->response) {
-            $this->response->closeCursor();
+        if (!$this->response) {
+            $this->need_count_total = true;
+            $this->execute();
+        } elseif (!$this->count_total) {
+            $this->need_count_total = true;
+
+            $stmt = $this->getStmt();
+            $stmt->execute();
+
+            $countStmt = $this->getResource()->prepare("SELECT FOUND_ROWS() as cnt;");
+            $countStmt->execute();
+
+            $found_data = $countStmt->fetch();
+            $this->count_total = $found_data['cnt'];
         }
+
+        return $this->count_total;
     }
+
 }
