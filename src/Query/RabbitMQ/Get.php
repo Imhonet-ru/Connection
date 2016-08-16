@@ -8,7 +8,6 @@
  */
 namespace Imhonet\Connection\Query\RabbitMQ;
 
-
 use Imhonet\Connection\Query\Query;
 use Imhonet\Connection\Resource\RabbitMQ;
 use PhpAmqpLib\Channel\AMQPChannel;

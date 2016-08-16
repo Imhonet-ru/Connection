@@ -8,7 +8,6 @@
 
 namespace Imhonet\Connection\Resource;
 
-
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 
