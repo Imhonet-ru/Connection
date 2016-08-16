@@ -49,7 +49,9 @@ class Set extends Query
     public function execute()
     {
         try {
-            if ($this->message === null) throw new \Exception('Не указано сообщение');
+            if ($this->message === null) {
+                throw new \Exception('Не указано сообщение');
+            }
 
             $message = new AMQPMessage();
             $message->setBody(json_encode($this->message));
@@ -86,11 +88,18 @@ class Set extends Query
      * @return AMQPChannel
      * @throws \Exception
      */
-    protected function getResource() {
+    protected function getResource()
+    {
         return parent::getResource();
     }
 
-    public function getCountTotal(){}
-    public function getCount(){}
-    public function getLastId(){}
+    public function getCountTotal()
+    {
+    }
+    public function getCount()
+    {
+    }
+    public function getLastId()
+    {
+    }
 }

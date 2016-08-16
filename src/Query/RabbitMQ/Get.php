@@ -28,7 +28,8 @@ class Get extends Query
     /**
      * @return int bitmask of Imhonet\Connection\Query\IQuery::STATUS_*
      */
-    public function getErrorCode(){
+    public function getErrorCode()
+    {
         if ($this->error) {
             return self::STATUS_ERROR;
         }
@@ -57,11 +58,18 @@ class Get extends Query
      * @return AMQPChannel
      * @throws \Exception
      */
-    protected function getResource() {
+    protected function getResource()
+    {
         return parent::getResource();
     }
 
-    public function getCountTotal(){}
-    public function getCount(){}
-    public function getLastId(){}
+    public function getCountTotal()
+    {
+    }
+    public function getCount()
+    {
+    }
+    public function getLastId()
+    {
+    }
 }

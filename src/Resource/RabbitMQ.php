@@ -129,7 +129,8 @@ class RabbitMQ implements IResource
     /**
      * @return AMQPStreamConnection
      */
-    protected function getConnect() {
+    protected function getConnect()
+    {
         if (!$this->connect) {
             $this->connect = new AMQPStreamConnection($this->host, $this->port, $this->user, $this->password);
         }
@@ -137,7 +138,13 @@ class RabbitMQ implements IResource
         return $this->connect;
     }
 
-    public function disconnect(){}
-    public function setDatabase($database){}
-    public function getDatabase(){}
+    public function disconnect()
+    {
+    }
+    public function setDatabase($database)
+    {
+    }
+    public function getDatabase()
+    {
+    }
 }

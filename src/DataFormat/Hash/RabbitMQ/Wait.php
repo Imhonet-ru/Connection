@@ -33,7 +33,8 @@ class Wait implements IArr
         return $this;
     }
 
-    public function setMessage(AMQPMessage $message) {
+    public function setMessage(AMQPMessage $message)
+    {
         $this->message = $message;
 
         return $this;
